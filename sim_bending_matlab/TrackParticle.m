@@ -7,8 +7,11 @@
 % select magnetic field map
 BMap = 'BGauss5';
 
-% z range for tracking
-ZRange = [ 0 10 ];
+% maximum trajectory length for tracking (this is actually 'track length'
+% that the particle traverses
+LRange = [ 0 10 ];
+
+% cutoff z position- this is absolute z in laboratory frame
 MaxZ = 3;
 
 % number of steps in time for tracking
@@ -31,7 +34,7 @@ P0   = [ pTotal * sin( theta ) 0 pTotal * cos( theta ) ];% GeV/c
 % This is the length of one step; bending, change in angle, and change
 % in momentum direction are expressed depending on this parameter
 lSteps = 500;
-lStep = diff(ZRange) / lSteps;
+lStep = diff(LRange) / lSteps;
 
 % track particle through magnetic field
 R = R0; % current position vector
