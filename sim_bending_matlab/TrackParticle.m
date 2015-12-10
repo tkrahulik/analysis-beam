@@ -54,7 +54,8 @@ for tstep = 1:tsteps
 
     % projection of magnetic field on particel velocity vector
     BLLocal = dot(P,BLocal) * P / ( P * P' );
-    BTLocal = cross(BLocal,BLLocal) / norm(cross(BLocal,BLLocal)) * norm( BLocal - BLLocal );
+    BTLocal = cross(P,BLocal) / norm(P);
+    %BTLocal = cross(BLocal,BLLocal) / norm(cross(BLocal,BLLocal)) * norm( BLocal - BLLocal );
     
     b_i  = norm( BLocal  );
     bL_i = norm( BLLocal );
@@ -101,17 +102,17 @@ for tstep = 1:tsteps
 end
 
 % save output
-Name = [ BMap sprintf('_%0.0fGeV',pTotal)];
+Name = [ BMap sprintf('_%0.3fGeV',pTotal)];
 save( [ 'Output/' Name '.mat' ] , 'theta' , 'phi' , 'pTotal' , 'Rs' , 'DeltaYRaws' );
 
 % Create figures
+
 % Fig 1
 figure('name',['BAndKick'],'PaperPositionMode','auto', ...
     'position',[100,0,600,1000]) ;
 
 % Subplot 1
 subplot(2,1,1);
-
 hold on;
 box on;
 grid on;
@@ -119,29 +120,20 @@ grid on;
 plot( Rs(:,3), BTotals, '-r');
 
 % xlabel('z (cm)','FontSize',15);
-ylabel('B (T)','FontSize',15);
+ylabel('B_{total} (T)','FontSize',15);
 
-legend('B_T', 'B_{Total}');
+% line(get(gca,'XLim'),[0,0],'Color','k');
 
-line(get(gca,'XLim'),[0,0],'Color','k');
-
-% Subplot 2
+% Subplot 2: Defelction in y
 subplot(2,1,2);
-
 hold on;
 box on;
 grid on;
 
 plot( Rs(:,3), DeltaYRaws, '-b');
 
-line( [Rs(1,3) Rs(end,3)], [DeltaYRaws(1) DeltaYRaws(end)] ...
-    ,'Color', 'k'...
-    ,'LineStyle', ':'...
-    );
-
 ylabel('\Delta y [m]','FontSize',15);
 xlabel('z [m]','FontSize',15);
 
-%title(sprintf('Position kick, max sg = %.0f \\mum',maxDeltaY*1000*1000));
-
+% Save Fig 1
 SaveCanvas( Name );
