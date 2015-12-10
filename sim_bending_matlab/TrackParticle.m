@@ -4,6 +4,9 @@
 % 'y' goes 'forward'
 % 'z' goes 'right'
 
+% All length units in m(eters)
+% All magnetic flux units in T(esla)
+
 % select magnetic field map
 BMap = 'BGauss5';
 
