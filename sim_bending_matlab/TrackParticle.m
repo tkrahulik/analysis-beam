@@ -101,10 +101,6 @@ for tstep = 1:tsteps
     deltaYRaw = deltaYRaw - DR(1,2);        
 end
 
-% save output
-Name = [ BMap sprintf('_%0.3fGeV',pTotal)];
-save( [ 'Output/' Name '.mat' ] , 'theta' , 'phi' , 'pTotal' , 'Rs' , 'DeltaYRaws' );
-
 % Create figures
 
 % Fig 1
@@ -135,5 +131,18 @@ plot( Rs(:,3), DeltaYRaws, '-b');
 ylabel('\Delta y [m]','FontSize',15);
 xlabel('z [m]','FontSize',15);
 
+
+% save output
+Name = [ BMap sprintf('_%0.3fGeV',pTotal)];
+
 % Save Fig 1
 SaveCanvas( Name );
+
+% Save Matlab data file
+save( [ 'Output/' Name '.mat' ] , 'theta' , 'phi' , 'pTotal' , 'Rs' , 'DeltaYRaws' );
+
+% Save output txt file
+fileID = fopen( ['Output/' Name '.txt' ] , 'w' );
+fprintf(fileID,'%6s %6s %6s\n','x','y','z');
+fprintf(fileID,'%6.4f %6.4f %6.4f\n', transpose(Rs) );
+fclose(fileID);
