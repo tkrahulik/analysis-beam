@@ -12,11 +12,11 @@ if ( strcmp( BMap , 'BSimple1' ) )
     end
 
 elseif ( strcmp( BMap , 'BGauss5' ) )
-    gmean = 1    % in meter
-    gsigma = 0.1 % in meter
-    gpeak = 5    % in mT
+    gmean = 1    % in m(eter)
+    gsigma = 0.1 % in m(eter)
+    gpeak = 0.005    % in T(esla)
     
-    Bx = gpeak / 4000. * Gauss( R(3) , gmean , gsigma )
+    Bx = gpeak * Gauss( R(3) , gmean , gsigma )
     
     BLocal = [ Bx 0 0 ]
 
