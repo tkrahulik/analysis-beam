@@ -137,6 +137,15 @@ grid on;
 
 plot( Rs(:,3), DeltaYRaws, '-b');
 
+% mark cryostat constraints
+cryostat_r_inner = 0.00635
+cryostat_l = 1.4
+
+line( [ (1-0.5*cryostat_l) (1+0.5*cryostat_l) ], [ -cryostat_r_inner -cryostat_r_inner ] ...
+    ,'Color', 'k'...
+    ,'LineStyle', ':'...
+    );
+
 ylabel('\Delta y [m]','FontSize',15);
 xlabel('z [m]','FontSize',15);
 
