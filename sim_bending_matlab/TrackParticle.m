@@ -15,7 +15,7 @@ BMap = 'BGauss5';
 LRange = [ 0 10 ];
 
 % cutoff z position- this is absolute z in laboratory frame
-MaxZ = 3;
+MaxZ = 4;
 
 % number of steps in time for tracking
 tsteps = 1000;
