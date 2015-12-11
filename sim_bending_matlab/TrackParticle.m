@@ -59,10 +59,13 @@ for tstep = 1:tsteps
     BLocal = GetLocalB( BMap, R );
 
     % projection of magnetic field on particel velocity vector
+    % Field 'Longitudinal' w.r.t. particle momentum
     BLLocal = dot(P,BLocal) * P / ( P * P' );
-    BTLocal = cross(P,BLocal) / norm(P);
-    %BTLocal = cross(BLocal,BLLocal) / norm(cross(BLocal,BLLocal)) * norm( BLocal - BLLocal );
     
+    % Field 'Transverse' w.r.t. particle momentum
+    BTLocal = cross(P,BLocal) / norm(P);
+
+    % get total, longitudinal, and transverse field norm
     b_i  = norm( BLocal  );
     bL_i = norm( BLLocal );
     bT_i = norm( BTLocal );
