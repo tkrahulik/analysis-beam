@@ -31,9 +31,9 @@ current2=$(cat "currents.txt" | grep $FILENAME | cut -d\  -f3)
 root -b -q -L beamspot_analysis.C\(\"${FILENAME}\"\)++ > tempoutput.txt
 
 #Obtain mean and standard deviation values for x and y
-meanx=$(cat tempoutput.txt | grep "mean x:" | cut -d: -f2)
+meanx=$(cat tempoutput.txt | grep "Mean x:" | cut -d: -f2)
 stdx=$(cat tempoutput.txt | grep "std x:" | cut -d: -f2)
-meany=$(cat tempoutput.txt | grep "mean y:" | cut -d: -f2)
+meany=$(cat tempoutput.txt | grep "Mean y:" | cut -d: -f2)
 stdy=$(cat tempoutput.txt | grep "std y:" | cut -d: -f2)
 
 #Write everything to the output file
