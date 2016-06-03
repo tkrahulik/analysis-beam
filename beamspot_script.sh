@@ -28,7 +28,7 @@ for FILENAME in $FILELIST; do
 current1=$(cat "currents.txt" | grep $FILENAME | cut -d\  -f2)
 current2=$(cat "currents.txt" | grep $FILENAME | cut -d\  -f3)
 #Run the image through the Beam Spot Analysis code
-root -b -q beamspot_analysis.C\(\"${FILENAME}\"\) > tempoutput.txt
+root -b -q -L beamspot_analysis.C\(\"${FILENAME}\"\)++ > tempoutput.txt
 
 #Obtain mean and standard deviation values for x and y
 meanx=$(cat tempoutput.txt | grep "mean x:" | cut -d: -f2)
