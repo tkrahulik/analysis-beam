@@ -26,7 +26,7 @@
 using namespace std;
 
 void beamspot_analysis(
-		       const TString in_image = "../Images/beam_2014_10_30_002.jpg"
+		       TString in_image = "../Images/beam_2014_10_30_002.jpg"
 		       )
 {
   //Read in Configuration File of Conversions and Measurements
