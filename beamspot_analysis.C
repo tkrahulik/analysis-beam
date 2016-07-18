@@ -26,7 +26,7 @@
 using namespace std;
 
 void beamspot_analysis(
-		       TString in_image = "../Images/beam_2014_10_30_002.jpg"
+		       TString in_image = "../Images/Test_2016_07_08/IMG_0017_edit.png"
 		       )
 {
   //Read in Configuration File of Conversions and Measurements
@@ -89,16 +89,9 @@ void beamspot_analysis(
   TCanvas *c_h_I = new TCanvas();
   c_h_I->Draw();
   h_I->Draw();
-  h_I->Fit("gaus", "", "", 0.8, 1);
 
-  /*
-   * Calculate cuts on intensity using parameters from Gaussian fit
-   */
-  float mean = h_I->GetFunction("gaus")->GetParameter(1);
-  float sigma = h_I->GetFunction("gaus")->GetParameter(2);
-
-  float I_lowcut = mean - 5*sigma;
-  float I_highcut = mean + 5*sigma;
+  float I_lowcut = 0.8;
+  float I_highcut = 1.0;
 
   /*
    *---------Beam Spot Histograms-----------
