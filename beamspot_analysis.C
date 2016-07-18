@@ -90,7 +90,8 @@ void beamspot_analysis(
   c_h_I->Draw();
   h_I->Draw();
 
-  float I_lowcut = 0.8;
+  //  float I_lowcut = 0.8;
+  float I_lowcut = 0.5;
   float I_highcut = 1.0;
 
   /*
