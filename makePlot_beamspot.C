@@ -29,7 +29,7 @@ int makePlot_beamspot(
   //  c1->Print("BNL_VDG_BeamPlot.png");
   //  c1->Print("BNL_VDG_BeamPlot.eps");
 
-  htemp->Fit("pol1");
+  htemp->Fit("pol1", "", "", -1.25, 1.0);
 
 
 
@@ -37,7 +37,7 @@ int makePlot_beamspot(
   TCanvas *c2 = new TCanvas();
   
   BeamTree->Draw("meany:I_x", "", "profs,e1");
-  htemp->Fit("pol1");
+  htemp->Fit("pol1", "", "", -1.25, 1.0);
 
 
   return 0;

@@ -3,7 +3,7 @@
 #Assign file name to output file variable
 OUTPUTFILE="beamspot_data.txt"
 
-CONFIGLIST="currents_LiCryo.txt"
+CONFIGLIST="currents_OCryo3.txt"
 
 #If an output file of this name already exists, remove it
 if [[ -e $OUTPUTFILE ]]; then
@@ -32,7 +32,9 @@ current1=$(cat $CONFIGLIST | grep $FILENAME | cut -d\  -f2)
 current2=$(cat $CONFIGLIST | grep $FILENAME | cut -d\  -f3)
 #Run the image through the Beam Spot Analysis code
 
-root -b -q -L beamspot_analysis.C++\(\"${FILENAME}\"\) > tempoutput.txt
+
+#root -b -q -L beamspot_analysis.C++\(\"${FILENAME}\"\) > tempoutput.txt
+root -b -q beamspot_nocompile.C\(\"${FILENAME}\"\) > tempoutput.txt
 
 #Obtain mean and standard deviation values for x and y
 meanx=$(cat tempoutput.txt | grep "Mean x:" | cut -d: -f2)
