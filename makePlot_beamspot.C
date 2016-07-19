@@ -1,5 +1,5 @@
 int makePlot_beamspot(
-		      const TString infile = "beamspot_data.txt"
+		      const TString infile = "BeamSpotData/beamspot_data.txt"
 		      )
 {
   gStyle->SetOptStat(0);

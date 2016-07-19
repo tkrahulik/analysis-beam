@@ -1,9 +1,9 @@
 #!/bin/bash
 #A shell script to run the Beam Spot Analysis code for multiple beam spot images
 #Assign file name to output file variable
-OUTPUTFILE="beamspot_data.txt"
+OUTPUTFILE="BeamSpotData/beamspot_data.txt"
 
-CONFIGLIST="currents_OCryo3.txt"
+CONFIGLIST="Currents/currents_ORoom3.txt"
 
 #If an output file of this name already exists, remove it
 if [[ -e $OUTPUTFILE ]]; then
@@ -23,7 +23,7 @@ FILELIST=$(cat $CONFIGLIST | cut -d\  -f1)
 #Loop through each image file
 for FILENAME in $FILELIST; do
     #Create ID for each image file from file names
-    FILEID=$(echo ${FILENAME} | cut -d\/ -f3 | cut -d_ -f8 | cut -d. -f1)
+    FILEID=$(echo ${FILENAME} | cut -d\/ -f4 | cut -d_ -f8 | cut -d. -f1)
     #Write statement to terminal as a check
     echo "Processing file $FILENAME with ID $FILEID"
 

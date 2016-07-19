@@ -152,6 +152,11 @@ void beamspot_analysis(
   float centerx = pix_x * convert;
   float centery = pix_y * convert;
 
+  TH1D* h_proj = h_cut->ProjectionX("h_proj", 0, -1, "");
+  TCanvas *c_proj = new TCanvas();
+  c_proj->Draw();
+  h_proj->Draw();
+
   std::cout << "Mean x: " << centerx << endl;
   std::cout << "std x: " << stdx << endl;
   std::cout << "Mean y: " << centery << endl;
@@ -180,4 +185,5 @@ void beamspot_analysis(
       fout->Close();
     }
 
+  return;
 }
