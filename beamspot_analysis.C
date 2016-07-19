@@ -22,6 +22,7 @@
 #include <TCanvas.h>
 #include <TH2D.h>
 #include <TStyle.h>
+#include <TFormula.h>
 
 using namespace std;
 
@@ -65,6 +66,9 @@ void beamspot_analysis(
 
   gStyle->SetOptStat(kFALSE);
   TImage *image = TImage::Open(in_image);
+  /*Use Gaussian Blur to Remove Effect of Noise (ie Single Intensity Pixels) */
+  /*VERY IMPORTANT! DOES NOT WORK WITHOUT*/
+  image->Blur(51, 51);
   UInt_t xPixels = image->GetWidth();
   UInt_t yPixels = image->GetHeight();
   UInt_t *argb   = image->GetArgbArray();
@@ -92,7 +96,7 @@ void beamspot_analysis(
   h_I->Draw();
 
   //  float I_lowcut = 0.8;
-  float I_lowcut = 0.1;
+  float I_lowcut = 0.03;
   float I_highcut = 1.0;
 
   /*
@@ -152,10 +156,15 @@ void beamspot_analysis(
   float centerx = pix_x * convert;
   float centery = pix_y * convert;
 
-  TH1D* h_proj = h_cut->ProjectionX("h_proj", 0, -1, "");
+  /*
+  TH1D* h_proj = h_cut->ProjectionX("h_proj", 0, -1, "d");
   TCanvas *c_proj = new TCanvas();
   c_proj->Draw();
   h_proj->Draw();
+  h_proj->Fit("gaus");
+  TF1 *gaus_fit = h_proj->GetFunction("gaus");
+  double new_centerx = gaus_fit->GetParameter(1);
+  */
 
   std::cout << "Mean x: " << centerx << endl;
   std::cout << "std x: " << stdx << endl;
