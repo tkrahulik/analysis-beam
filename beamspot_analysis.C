@@ -26,7 +26,8 @@
 using namespace std;
 
 void beamspot_analysis(
-		       TString in_image = "../Images/Test_2016_07_08/IMG_0017_edit.png"
+		       TString in_image = "../Images/Test_2016_07_08/IMG_0017_edit.png",
+		       TString root_output = ""
 		       )
 {
   //Read in Configuration File of Conversions and Measurements
@@ -91,7 +92,7 @@ void beamspot_analysis(
   h_I->Draw();
 
   //  float I_lowcut = 0.8;
-  float I_lowcut = 0.5;
+  float I_lowcut = 0.1;
   float I_highcut = 1.0;
 
   /*
@@ -170,4 +171,13 @@ void beamspot_analysis(
   c_image->Draw();
   image->Draw();
   image->DrawEllips(pix_x, pix_y, stdx, stdy, 1, "#FF0000", 3);
+
+  if ( root_output != "" )
+    {
+      TFile *fout = new TFile( root_output , "RECREATE" );
+      h_I->Write();
+      image->Write();
+      fout->Close();
+    }
+
 }
