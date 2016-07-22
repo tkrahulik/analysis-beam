@@ -31,14 +31,18 @@ for FILENAME in $FILELIST; do
 current1=$(cat $CONFIGLIST | grep $FILENAME | cut -d\  -f2)
 current2=$(cat $CONFIGLIST | grep $FILENAME | cut -d\  -f3)
 
-EPSNAME=$(echo ${PNGLocale}$( echo ${FILENAME} | cut -d\/ -f4 | sed -s 's/.JPG/.pdf/g') )
-echo $EPSNAME
+PNGNAME=$(echo ${PNGLocale}$( echo ${FILENAME} | cut -d\/ -f4 | sed -s 's/.JPG/.png/g') )
+echo $PNGNAME
+PDFNAME=$(echo ${PNGLocale}$( echo ${FILENAME} | cut -d\/ -f4 | sed -s 's/.JPG/.pdf/g') )
+echo $PDFNAME
+
 #Run the image through the Beam Spot Analysis code
 
 
 #root -b -q -L beamspot_analysis.C++\(\"${FILENAME}\"\) > tempoutput.txt
-root -b -q beamspot_nocompile.C\(\"${FILENAME}\",\"${EPSNAME}\"\) > tempoutput.txt
+root -b -q beamspot_nocompile.C\(\"${FILENAME}\",\"${PNGNAME}\"\) > tempoutput.txt
 
+convert ${PNGNAME} ${PDFNAME}
 #Obtain mean and standard deviation values for x and y
 meanx=$(cat tempoutput.txt | grep "Mean x:" | cut -d: -f2)
 stdx=$(cat tempoutput.txt | grep "std x:" | cut -d: -f2)
@@ -51,4 +55,4 @@ echo "$FILEID ${current1} ${current2} ${meanx} ${stdx} ${meany} ${stdy}" >> beam
 #Done with the for loop, although this command is pretty self-explanatory
 done
 
-gs -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile="../Images/LiRoom_QCheck/LiRoomTest.pdf" "../Images/LiRoom_QCheck/IMG*.pdf"
+gs -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sEPSCrop -sOutputFile=../Images/LiRoom_QCheck/LiRoomTest2.pdf ../Images/LiRoom_QCheck/IMG*.eps

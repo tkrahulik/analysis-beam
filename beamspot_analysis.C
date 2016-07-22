@@ -37,8 +37,8 @@ void beamspot_analysis(
 {
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPalette(55);
-  gStyle->SetCanvasDefH(999);
-  gStyle->SetCanvasDefW(666);
+  gStyle->SetCanvasDefH(6000);
+  gStyle->SetCanvasDefW(4000);
 
   TCanvas* c_qcheck = new TCanvas();
   c_qcheck->Divide(2,3);
@@ -245,7 +245,7 @@ void beamspot_analysis(
 
   if(qualitycheck != "")
     {
-      c_qcheck->Print(qualitycheck, "pdf");
+      c_qcheck->Print(qualitycheck);
     }
 
   if ( root_output != "" )
