@@ -1,9 +1,9 @@
 #!/bin/bash
 #A shell script to run the Beam Spot Analysis code for multiple beam spot images
 #Assign file name to output file variable
-OUTPUTFILE="BeamSpotData/beamspot_data.txt"
-
-CONFIGLIST="Currents/currents_ORoom3.txt"
+OUTPUTFILE="beamspot_data.txt"
+PNGLocale="../Images/LiRoom_QCheck/"
+CONFIGLIST="Currents/currents_shorttest.txt"
 
 #If an output file of this name already exists, remove it
 if [[ -e $OUTPUTFILE ]]; then
@@ -30,11 +30,14 @@ for FILENAME in $FILELIST; do
 #Obtain current values used to create the beam spot in the associated image file
 current1=$(cat $CONFIGLIST | grep $FILENAME | cut -d\  -f2)
 current2=$(cat $CONFIGLIST | grep $FILENAME | cut -d\  -f3)
+
+EPSNAME=$(echo ${PNGLocale}$( echo ${FILENAME} | cut -d\/ -f4 | sed -s 's/.JPG/.pdf/g') )
+echo $EPSNAME
 #Run the image through the Beam Spot Analysis code
 
 
 #root -b -q -L beamspot_analysis.C++\(\"${FILENAME}\"\) > tempoutput.txt
-root -b -q beamspot_nocompile.C\(\"${FILENAME}\"\) > tempoutput.txt
+root -b -q beamspot_nocompile.C\(\"${FILENAME}\",\"${EPSNAME}\"\) > tempoutput.txt
 
 #Obtain mean and standard deviation values for x and y
 meanx=$(cat tempoutput.txt | grep "Mean x:" | cut -d: -f2)
@@ -48,4 +51,4 @@ echo "$FILEID ${current1} ${current2} ${meanx} ${stdx} ${meany} ${stdy}" >> beam
 #Done with the for loop, although this command is pretty self-explanatory
 done
 
-
+gs -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile="../Images/LiRoom_QCheck/LiRoomTest.pdf" "../Images/LiRoom_QCheck/IMG*.pdf"

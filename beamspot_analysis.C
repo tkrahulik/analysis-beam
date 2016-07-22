@@ -23,48 +23,63 @@
 #include <TH2D.h>
 #include <TStyle.h>
 #include <TFormula.h>
+#include <TLine.h>
+#include <TFrame.h>
 
 using namespace std;
 
+
 void beamspot_analysis(
 		       TString in_image = "../Images/Test_2016_07_08/IMG_0017_edit.png",
+		       TString qualitycheck = "",
 		       TString root_output = ""
 		       )
 {
-  //Read in Configuration File of Conversions and Measurements
-  const char* fconfig = "beamspot_config.txt";
-  cout<< "processing file " << fconfig <<endl;
-  std::ifstream infile(fconfig);
-
-  std::string label, FullLine;
-  double convert, pipe;
-
-  getline(infile, FullLine);
-
-  while ( !infile.eof() )
-    {
-      if ( FullLine[0]=='#' || FullLine.substr(0, 2) == "//" )
-	{
-	  getline(infile,FullLine);
-	  continue;
-	}
-
-      istringstream line( FullLine.c_str() );
-      line >> label;
-      if (label == "conversion"){
-	line >> convert;
-	std::cout << "Conversion: " << convert << endl;
-      }
-      else if (label == "pipe_distance"){
-	line >> pipe;
-	std::cout << "Beam Pipe Length: " << pipe << endl;
-      }
-
-      getline(infile, FullLine);
-
-    }
-
   gStyle->SetOptStat(kFALSE);
+  gStyle->SetPalette(55);
+  gStyle->SetCanvasDefH(999);
+  gStyle->SetCanvasDefW(666);
+
+  TCanvas* c_qcheck = new TCanvas();
+  c_qcheck->Divide(2,3);
+  TImage *image1 = TImage::Open(in_image);
+  c_qcheck->cd(1);
+  image1->Draw();
+  UInt_t xPixels1 = image1->GetWidth();
+  UInt_t yPixels1 = image1->GetHeight();
+  UInt_t *argb1 = image1->GetArgbArray();
+
+  float I_lowcut1 = 0.03;
+  float I_highcut1 = 1.0;
+  /*
+   *---------Beam Spot Histograms-----------
+   * Turn beam spot images into two-dimensional histograms with intensity on z-axis
+   * One histogram is entire image without intensity cut
+   * Second histogram makes intensity cuts
+   * and removes lower right corner to exclude time stamp
+   */
+
+  TH2D* h_rep1 = new TH2D("h_rep1","Beam Spot",xPixels1,0,xPixels1,yPixels1,-1.0*yPixels1,0);
+  TH2D* h_cut1 = new TH2D("h_cut1","Beam Spot with Intensity Cut of 3%",xPixels1,0,xPixels1,yPixels1,-1.0*yPixels1,0);
+
+  for (UInt_t row1=0; row1<xPixels1; ++row1) {
+    for (UInt_t col1=0; col1<yPixels1; ++col1) {
+      int index1 = col1*xPixels1+row1;
+      float gray1 = float(argb1[index1]&0xff)/256.;
+
+      h_rep1->SetBinContent(row1+1,yPixels1-col1,gray1);
+      
+      //Intensity Cut
+      if ((gray1 >= I_lowcut1) & (gray1 <= I_highcut1)){
+	  h_cut1->SetBinContent(row1+1,yPixels1-col1,gray1);
+      }
+    }
+  }
+
+  double convert = 1.0; 
+  double pipe = 1000.0;
+  cout << convert << " " << pipe << endl;
+
   TImage *image = TImage::Open(in_image);
   /*Use Gaussian Blur to Remove Effect of Noise (ie Single Intensity Pixels) */
   /*VERY IMPORTANT! DOES NOT WORK WITHOUT*/
@@ -75,7 +90,6 @@ void beamspot_analysis(
 
   std::cout << "Pixels along x-axis: " << xPixels << endl;
   std::cout << "Pixels along y-axis: " << yPixels << endl;
-
   /*
    *----------Intensity Histogram----------
    * Fill intensity histogram to determine 
@@ -90,11 +104,11 @@ void beamspot_analysis(
       h_I->Fill(gray);
     }
   }
-
+  /*
   TCanvas *c_h_I = new TCanvas();
   c_h_I->Draw();
   h_I->Draw();
-
+  */
   //  float I_lowcut = 0.8;
   float I_lowcut = 0.03;
   float I_highcut = 1.0;
@@ -107,8 +121,8 @@ void beamspot_analysis(
    * and removes lower right corner to exclude time stamp
    */
 
-  TH2D* h_rep = new TH2D("h_rep","Beam Spot",xPixels,-1,1,yPixels,-1,1);
-  TH2D* h_cut = new TH2D("h_cut","Beam Spot with Intensity Cut",xPixels,-1,1,yPixels,-1,1);
+  TH2D* h_rep = new TH2D("h_rep","Beam Spot After Gaussian Blur",xPixels,0,xPixels,yPixels,-1.0*yPixels,0);
+  TH2D* h_cut = new TH2D("h_cut","Beam Spot with Intensity Cut of 3% After Gaussian Blur",xPixels,0,xPixels,yPixels,-1.0*yPixels, 0);
 
   float weight_sumx = 0;
   float weight_sumy = 0;
@@ -156,35 +170,83 @@ void beamspot_analysis(
   float centerx = pix_x * convert;
   float centery = pix_y * convert;
 
-  /*
-  TH1D* h_proj = h_cut->ProjectionX("h_proj", 0, -1, "d");
-  TCanvas *c_proj = new TCanvas();
-  c_proj->Draw();
-  h_proj->Draw();
-  h_proj->Fit("gaus");
-  TF1 *gaus_fit = h_proj->GetFunction("gaus");
-  double new_centerx = gaus_fit->GetParameter(1);
-  */
-
   std::cout << "Mean x: " << centerx << endl;
   std::cout << "std x: " << stdx << endl;
   std::cout << "Mean y: " << centery << endl;
   std::cout << "std y: " << stdy << endl;
 
-  gStyle->SetPalette(55);
-  gStyle->SetCanvasDefH(yPixels);
-  gStyle->SetCanvasDefW(xPixels);
-  TCanvas *c_rep = new TCanvas();
-  c_rep->Draw();
-  h_rep->Draw("colz");
-  TCanvas *c_cut = new TCanvas();
-  c_cut->Draw();
+  c_qcheck->cd(2);
+  h_rep1->Draw("colz");
+  c_qcheck->cd(3);
+  h_cut1->Draw("colz");
+  
+  c_qcheck->cd(4);
+  TH1D* h_proj1 = h_cut1->ProjectionX("h_proj1", 0, -1, "d");
+  double ytop1 = h_proj1->GetBinContent( h_proj1->GetMaximumBin() );
+  double ybot1 = 0.0;
+
+  TH1D* h_empty1 = new TH1D("h_empty1", "Projection of Beam Spot Intensity Along X-Axis", 10*stdx, centerx-5*stdx, centerx+5*stdx);
+  h_empty1->GetYaxis()->SetRangeUser( ybot1, ytop1*1.05 );
+  h_empty1->GetXaxis()->SetTitle("x Position (Pixels)");
+  h_empty1->GetYaxis()->SetTitle("Sum of Intensities at x Position");
+  h_empty1->GetYaxis()->SetTitleOffset(1.1);
+  h_empty1->SetLineColor(kWhite);
+
+  h_empty1->Draw();
+  h_proj1->Draw("same");
+  
+  TLine *beamcenter1 = new TLine(centerx, ybot1, centerx, ytop1*1.05);
+  beamcenter1->SetLineColor(kRed);
+  beamcenter1->Draw();
+  TLine *beamstdup1 = new TLine(centerx+stdx, ybot1, centerx+stdx, ytop1*1.05);
+  beamstdup1->SetLineColor(kRed);
+  beamstdup1->SetLineStyle(2);
+  beamstdup1->Draw();
+  TLine *beamstddown1 = new TLine(centerx-stdx, ybot1, centerx-stdx, ytop1*1.05);
+  beamstddown1->SetLineColor(kRed);
+  beamstddown1->SetLineStyle(2);
+  beamstddown1->Draw();
+
+
+  c_qcheck->cd(5);
   h_cut->Draw("colz");
 
-  TCanvas *c_image = new TCanvas();
-  c_image->Draw();
-  image->Draw();
-  image->DrawEllips(pix_x, pix_y, stdx, stdy, 1, "#FF0000", 3);
+  c_qcheck->cd(6);
+  TH1D* h_proj = h_cut->ProjectionX("h_proj", 0, -1, "d");
+  double ytop = h_proj->GetBinContent( h_proj->GetMaximumBin() );
+  double ybot = 0.0;
+
+  TH1D* h_empty = new TH1D("h_empty", "Projection of Beam Spot Intensity Along X-Axis After Gaussian Blur", 10*stdx, centerx-5*stdx, centerx+5*stdx);
+  h_empty->GetYaxis()->SetRangeUser( ybot, ytop*1.05 );
+  h_empty->GetXaxis()->SetTitle("x Position (Pixels)");
+  h_empty->GetYaxis()->SetTitle("Sum of Intensities at x Position");
+  h_empty->GetYaxis()->SetTitleOffset(1.1);
+  h_empty->SetLineColor(kWhite);
+
+  h_empty->Draw();
+  h_proj->Draw("same");
+
+  TLine *beamcenter = new TLine(centerx, ybot*0.5, centerx, ytop*1.05);
+  beamcenter->SetLineColor(kRed);
+  beamcenter->Draw();
+  TLine *beamstdup = new TLine(centerx+stdx, ybot*0.5, centerx+stdx, ytop*1.05);
+  beamstdup->SetLineColor(kRed);
+  beamstdup->SetLineStyle(2);
+  beamstdup->Draw();
+  TLine *beamstddown = new TLine(centerx-stdx, ybot*0.5, centerx-stdx, ytop*1.05);
+  beamstddown->SetLineColor(kRed);
+  beamstddown->SetLineStyle(2);
+  beamstddown->Draw();
+  /*  TCanvas *c_rep = new TCanvas();
+  c_rep->Draw();
+  h_rep->Draw("colz");
+  */
+  image1->DrawEllips(pix_x, pix_y, stdx, stdy, 1, "#FF0000", 3);
+
+  if(qualitycheck != "")
+    {
+      c_qcheck->Print(qualitycheck, "pdf");
+    }
 
   if ( root_output != "" )
     {
